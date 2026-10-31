@@ -10,10 +10,17 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
-  "keywords": ["lms", "e-learning", "multi-tenant", "express", "prisma"],
+  "keywords": [
+    "lms",
+    "e-learning",
+    "multi-tenant",
+    "express",
+    "prisma"
+  ],
   "author": "SHEK'sLMS Team",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^2.32.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

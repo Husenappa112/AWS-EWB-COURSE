@@ -107,3 +107,13 @@ export interface GamificationProfile {
     awardedAt: string;
   }[];
 }
+
+export interface Certificate {
+  id: string;
+  courseTitle: string;
+  recipientName: string;
+  organizationName: string;
+  certificateCode: string;
+  issuedDate: string;
+  grade: number;
+}

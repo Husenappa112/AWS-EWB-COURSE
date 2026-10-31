@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { AIAssistantDrawer } from '../../components/AIAssistantDrawer';
+import { CertificateModal } from '../../components/CertificateModal';
+import type { Certificate } from '../../types';
 import {
   ArrowLeft,
   CheckCircle,
@@ -11,6 +14,7 @@ import {
   Clock,
   Check,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 
 interface CoursePlayerProps {
@@ -36,6 +40,10 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
+
+  // AI & Certificate Modals State
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isCertOpen, setIsCertOpen] = useState(false);
 
   if (!course || !activeLesson) {
     return (
@@ -86,6 +94,19 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
     }
   };
 
+  const certificateData: Certificate = {
+    id: `cert-${course.id}`,
+    courseTitle: course.title,
+    recipientName: 'Arjun Verma',
+    organizationName: 'Acme Corporation',
+    certificateCode: `SHEK-${course.id.slice(0, 4).toUpperCase()}-ARJUN-2026`,
+    issuedDate: 'October 31, 2026',
+    grade: quizScore !== null ? quizScore : 95,
+  };
+
+  const canShowCertificate =
+    enrollment?.status === 'COMPLETED' || (quizScore !== null && quizScore >= 80);
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
       {/* Course Player Top Navigation Bar */}
@@ -105,11 +126,32 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </div>
         </div>
 
-        {/* Course Overall Progress Indicator */}
-        <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2">
+        {/* Course Controls: AI Assistant, Progress, and Certificate */}
+        <div className="flex items-center gap-3">
+          {/* AI Learning Assistant Toggle Button */}
+          <button
+            onClick={() => setIsAiOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 hover:bg-indigo-900 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden sm:inline">AI Assistant</span>
+          </button>
+
+          {/* Certificate View Button (if earned) */}
+          {canShowCertificate && (
+            <button
+              onClick={() => setIsCertOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-950 text-amber-300 border border-amber-600/60 hover:bg-amber-900 shadow-sm transition-colors"
+            >
+              <Award className="w-3.5 h-3.5 text-amber-400" />
+              <span>Certificate</span>
+            </button>
+          )}
+
+          {/* Progress Indicator */}
+          <div className="hidden md:flex items-center gap-2">
             <span className="text-xs text-slate-400">Progress:</span>
-            <div className="w-32 bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div className="w-28 bg-slate-800 h-2 rounded-full overflow-hidden">
               <div
                 className="bg-blue-500 h-full transition-all duration-300"
                 style={{ width: `${enrollment?.progress || 0}%` }}
@@ -135,7 +177,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
             ) : (
               <>
                 <CheckCircle className="w-4 h-4" />
-                <span>Mark Complete & Next</span>
+                <span>Mark Complete</span>
               </>
             )}
           </button>
@@ -275,17 +317,28 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                 {/* Submit Quiz Actions */}
                 <div className="flex items-center justify-end gap-3 pt-4">
                   {quizSubmitted ? (
-                    <button
-                      onClick={() => {
-                        setQuizSubmitted(false);
-                        setSelectedAnswers({});
-                        setQuizScore(null);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Retake Quiz</span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {quizScore !== null && quizScore >= activeLesson.assessment.passPercentage && (
+                        <button
+                          onClick={() => setIsCertOpen(true)}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md transition-colors"
+                        >
+                          <Award className="w-4 h-4" />
+                          <span>View Official Certificate</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setQuizSubmitted(false);
+                          setSelectedAnswers({});
+                          setQuizScore(null);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Retake Quiz</span>
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={handleQuizSubmit}
@@ -353,23 +406,46 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           {/* Certificate Generation Status */}
           {course.certificateEnabled && (
             <div className="p-4 border-t border-slate-800 bg-slate-900/60">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-                  <Award className="w-5 h-5" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-200">Official Certificate</p>
+                    <p className="text-[11px] text-slate-400">
+                      {canShowCertificate ? 'Issued & Verified' : 'Unlocks upon 100% completion'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-200">Official Certificate</p>
-                  <p className="text-[11px] text-slate-400">
-                    {enrollment?.status === 'COMPLETED'
-                      ? 'Issued & Verified'
-                      : 'Unlocks upon 100% completion'}
-                  </p>
-                </div>
+                {canShowCertificate && (
+                  <button
+                    onClick={() => setIsCertOpen(true)}
+                    className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-amber-400 text-slate-950 hover:bg-amber-300"
+                  >
+                    View
+                  </button>
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Slide-out AI Assistant Drawer */}
+      <AIAssistantDrawer
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
+        courseTitle={course.title}
+        currentLessonTitle={activeLesson.title}
+      />
+
+      {/* Official Certificate Modal */}
+      <CertificateModal
+        isOpen={isCertOpen}
+        onClose={() => setIsCertOpen(false)}
+        certificate={certificateData}
+      />
     </div>
   );
 };

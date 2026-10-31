@@ -26,28 +26,32 @@ This document tracks all tasks, their implementation status, associated files, a
 
 ---
 
-## Phase 1: UI & Application Shell (IN PROGRESS)
+## Phase 1: UI & Application Shell (100% Completed)
 
 | Task ID | Task Description | Status | Files Involved | Verification Evidence |
 |---|---|---|---|---|
-| P1-T01 | Professional Landing Page | **IN PROGRESS** | `frontend/src/pages/LandingPage.tsx` | Platform overview, role demo launcher |
-| P1-T02 | Auth Pages (Login, Demo Switcher) | **IN PROGRESS** | `frontend/src/pages/LoginPage.tsx` | 1-click role logins for demonstration |
-| P1-T03 | Super Admin Shell & Dashboard | NOT STARTED | `frontend/src/layouts/AdminLayout.tsx` | Platform stats, orgs, global controls |
-| P1-T04 | Trainer Shell & Dashboard | NOT STARTED | `frontend/src/layouts/TrainerLayout.tsx` | Courses, curriculum, student grading |
-| P1-T05 | Learner Shell & Dashboard | NOT STARTED | `frontend/src/layouts/LearnerLayout.tsx` | Catalog, course player, quizzes, certificates |
-| P1-T06 | Reusable UI Component Library | NOT STARTED | `frontend/src/components/ui/*` | Cards, badges, modals, stats |
-| P1-T07 | Dark/Light Theme Support | NOT STARTED | `frontend/src/context/ThemeContext.tsx` | Theme switching |
+| P1-T01 | Role Portal Navigation & Switcher | **VERIFIED** | `frontend/src/components/Navbar.tsx` | 1-click role switcher across 4 personas |
+| P1-T02 | Evaluation & Demo Guide Modal | **VERIFIED** | `frontend/src/components/DemoGuideModal.tsx` | Interactive demo guide with accounts and verified checks |
+| P1-T03 | Super Admin Shell & Dashboard | **VERIFIED** | `frontend/src/pages/admin/AdminDashboard.tsx` | Multi-tenant tenant directory, provisioning, audit |
+| P1-T04 | Trainer Studio & Dashboard | **VERIFIED** | `frontend/src/pages/trainer/TrainerDashboard.tsx` | Metrics, course management, manual and AI course builder |
+| P1-T05 | Learner Shell & Catalog | **VERIFIED** | `frontend/src/pages/learner/LearnerDashboard.tsx` | Active enrollments, search catalog, gamification |
+| P1-T06 | Immersive Course Player | **VERIFIED** | `frontend/src/pages/learner/CoursePlayer.tsx` | Video, document, interactive quiz engine, pass thresholds |
 
 ---
 
-## Phase 2: Backend & Security Architecture (VERIFIED Baseline)
+## Phase 6: Assessments & Certifications (VERIFIED)
 
 | Task ID | Task Description | Status | Files Involved | Verification Evidence |
 |---|---|---|---|---|
-| P2-T01 | Express Server & App Config | **VERIFIED** | `backend/src/index.ts` | Server boots with Helmet, CORS, logging |
-| P2-T02 | Database Connection & Prisma Client | **VERIFIED** | `backend/src/lib/prisma.ts` | Prisma client operational with multi-tenant schema |
-| P2-T03 | User Auth API & JWT Token Handling | **VERIFIED** | `backend/src/modules/auth/*` | Login endpoint, bcrypt verification, JWT signing & decoding verified |
-| P2-T04 | RBAC Middleware | **VERIFIED** | `backend/src/middleware/auth.ts` | Role guards for SuperAdmin, OrgAdmin, Trainer, Learner |
-| P2-T05 | Multi-Tenant Scoping | **VERIFIED** | `backend/prisma/schema.prisma` | OrganizationId scoping across models |
-| P2-T06 | Courses & Curriculum API | **VERIFIED** | `backend/src/modules/courses/*` | Course list, details, enroll endpoints |
-| P2-T07 | Learner Progress & Auto-Grading API | **VERIFIED** | `backend/src/modules/learner/*` | Progress calculation, quiz submission & instant grading |
+| P6-T01 | Quiz Auto-Grading Engine | **VERIFIED** | `CoursePlayer.tsx`, `learner.routes.ts` | Instant scoring, answer validation & explanations |
+| P6-T02 | Official Certificate Generator | **VERIFIED** | `CertificateModal.tsx` | Verifiable certificate with cryptographic credential code |
+
+---
+
+## Phase 8: AI & Intelligent Learning (VERIFIED)
+
+| Task ID | Task Description | Status | Files Involved | Verification Evidence |
+|---|---|---|---|---|
+| P8-T01 | Google GenAI SDK & Key Setup | **VERIFIED** | `backend/.env`, `package.json` | `@google/genai` installed and configured |
+| P8-T02 | AI Course & Quiz Generator | **VERIFIED** | `ai.service.ts`, `ai.routes.ts`, `TrainerDashboard.tsx` | Multi-module curriculum & quiz generation verified |
+| P8-T03 | AI Learning Assistant (Citations)| **VERIFIED** | `AIAssistantDrawer.tsx`, `ai.service.ts` | Slide-out assistant with lesson citations verified |
