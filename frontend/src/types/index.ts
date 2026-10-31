@@ -177,3 +177,49 @@ export interface ProjectSubmission {
   mentorFeedback?: string;
   grade?: string;
 }
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ALERT';
+  isRead: boolean;
+  linkTab?: string;
+}
+
+export interface SkillCompetency {
+  id: string;
+  skillName: string;
+  category: string;
+  currentProficiency: number;
+  targetProficiency: number;
+  gap: number;
+  recommendedCourse: string;
+  certifiedEmployeesCount: number;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  actor: string;
+  action: string;
+  tenant: string;
+  ipAddress: string;
+  status: 'SUCCESS' | 'WARNING' | 'FAILED';
+}
+
+export interface CourseDiscussion {
+  id: string;
+  courseId: string;
+  authorName: string;
+  authorRole: string;
+  authorAvatar: string;
+  title: string;
+  content: string;
+  timestamp: string;
+  upvotes: number;
+  isPinned?: boolean;
+  repliesCount: number;
+}
+

@@ -9,6 +9,10 @@ import type {
   InterviewSchedule,
   ScheduledExam,
   ProjectSubmission,
+  AppNotification,
+  SkillCompetency,
+  AuditLog,
+  CourseDiscussion,
 } from '../types';
 import {
   DEMO_USERS,
@@ -18,6 +22,10 @@ import {
   INITIAL_INTERVIEWS,
   INITIAL_EXAMS,
   INITIAL_PROJECT_SUBMISSIONS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_SKILLS,
+  INITIAL_AUDIT_LOGS,
+  INITIAL_DISCUSSIONS,
 } from '../data/mockData';
 
 export type ActiveNavTab = 'home' | 'courses' | 'projects' | 'about' | 'contact' | 'portal';
@@ -37,6 +45,14 @@ interface AppContextType {
   interviews: InterviewSchedule[];
   exams: ScheduledExam[];
   projectSubmissions: ProjectSubmission[];
+  notifications: AppNotification[];
+  markNotificationAsRead: (id: string) => void;
+  clearAllNotifications: () => void;
+  skills: SkillCompetency[];
+  auditLogs: AuditLog[];
+  discussions: CourseDiscussion[];
+  addDiscussion: (discussion: Omit<CourseDiscussion, 'id' | 'timestamp' | 'upvotes' | 'repliesCount'>) => void;
+  upvoteDiscussion: (id: string) => void;
   enrollInCourse: (courseId: string) => void;
   updateLessonProgress: (courseId: string, lessonId: string, isCompleted: boolean) => void;
   activeCoursePlayerId: string | null;
@@ -60,6 +76,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [interviews] = useState<InterviewSchedule[]>(INITIAL_INTERVIEWS);
   const [exams] = useState<ScheduledExam[]>(INITIAL_EXAMS);
   const [projectSubmissions, setProjectSubmissions] = useState<ProjectSubmission[]>(INITIAL_PROJECT_SUBMISSIONS);
+  const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
+  const [skills] = useState<SkillCompetency[]>(INITIAL_SKILLS);
+  const [auditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
+  const [discussions, setDiscussions] = useState<CourseDiscussion[]>(INITIAL_DISCUSSIONS);
   const [activeCoursePlayerId, setActiveCoursePlayerId] = useState<string | null>(null);
   const [authModalType, setAuthModalType] = useState<'login' | 'signup' | null>(null);
 
@@ -81,6 +101,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentUser(null);
     setActiveNavTab('home');
     setActiveCoursePlayerId(null);
+  };
+
+  const markNotificationAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  };
+
+  const addDiscussion = (discussion: Omit<CourseDiscussion, 'id' | 'timestamp' | 'upvotes' | 'repliesCount'>) => {
+    const newDisc: CourseDiscussion = {
+      ...discussion,
+      id: `disc-${Date.now()}`,
+      timestamp: 'Just now',
+      upvotes: 1,
+      repliesCount: 0,
+    };
+    setDiscussions((prev) => [newDisc, ...prev]);
+  };
+
+  const upvoteDiscussion = (id: string) => {
+    setDiscussions((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, upvotes: d.upvotes + 1 } : d))
+    );
   };
 
   const enrollInCourse = (courseId: string) => {
@@ -173,6 +220,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         interviews,
         exams,
         projectSubmissions,
+        notifications,
+        markNotificationAsRead,
+        clearAllNotifications,
+        skills,
+        auditLogs,
+        discussions,
+        addDiscussion,
+        upvoteDiscussion,
         enrollInCourse,
         updateLessonProgress,
         activeCoursePlayerId,
