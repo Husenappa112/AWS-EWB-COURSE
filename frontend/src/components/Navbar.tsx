@@ -10,6 +10,10 @@ import {
   ChevronDown,
   Info,
   Building,
+  LogOut,
+  LayoutDashboard,
+  Menu,
+  X,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -17,46 +21,106 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDemoInfo }) => {
-  const { currentUser, currentRole, switchRole, gamification } = useApp();
+  const {
+    activeNavTab,
+    setActiveNavTab,
+    isLoggedIn,
+    currentUser,
+    currentRole,
+    switchRole,
+    logout,
+    gamification,
+    setAuthModalType,
+  } = useApp();
+
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const roles: { role: UserRole; label: string; icon: any; color: string }[] = [
-    { role: 'SUPER_ADMIN', label: 'Super Admin', icon: Shield, color: 'text-purple-600 bg-purple-50' },
+    { role: 'SUPER_ADMIN', label: 'Super Admin (Shekanna H)', icon: Shield, color: 'text-purple-600 bg-purple-50' },
     { role: 'ORG_ADMIN', label: 'Org Admin', icon: Building, color: 'text-blue-600 bg-blue-50' },
-    { role: 'TRAINER', label: 'Trainer', icon: Briefcase, color: 'text-emerald-600 bg-emerald-50' },
-    { role: 'LEARNER', label: 'Learner', icon: GraduationCap, color: 'text-amber-600 bg-amber-50' },
+    { role: 'TRAINER', label: 'Trainer (Ananya)', icon: Briefcase, color: 'text-emerald-600 bg-emerald-50' },
+    { role: 'LEARNER', label: 'Learner (Arjun)', icon: GraduationCap, color: 'text-amber-600 bg-amber-50' },
   ];
 
   const currentRoleConfig = roles.find((r) => r.role === currentRole) || roles[3];
 
+  const navLinks = [
+    { id: 'home', label: 'Home' },
+    { id: 'courses', label: 'Courses & Syllabus' },
+    { id: 'projects', label: 'Projects & Labs' },
+    { id: 'about', label: 'About Us' },
+    { id: 'contact', label: 'Contact' },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
+      {/* Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 text-white text-[11px] py-1.5 px-4 text-center font-medium">
+        <span>🚀 Winter 2026 Enterprise Batches Now Open with Guaranteed Industrial Projects. </span>
+        <span className="font-semibold underline ml-1">Architected by Shekanna H (Call: 7022615394)</span>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Platform Name */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <div
+            onClick={() => setActiveNavTab('home')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-xl tracking-tight text-slate-900">
+                <span className="font-extrabold text-xl tracking-tight text-slate-900">
                   SHEK's<span className="text-blue-600">LMS</span>
                 </span>
-                <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                   Enterprise
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">
-                {currentUser?.organizationName || 'Cloud LMS Platform'}
+              <p className="text-[10px] text-slate-500 font-medium">
+                Dev: Shekanna H · +91 7022615394
               </p>
             </div>
           </div>
 
-          {/* Right Action Controls: Role Switcher, Gamification, and Profile */}
-          <div className="flex items-center gap-3">
-            {/* Gamification Streak & Points (Only shown for Learner) */}
-            {currentRole === 'LEARNER' && (
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => setActiveNavTab(link.id as any)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  activeNavTab === link.id
+                    ? 'text-blue-600 bg-blue-50/70 font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+
+            {isLoggedIn && (
+              <button
+                onClick={() => setActiveNavTab('portal')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeNavTab === 'portal'
+                    ? 'text-white bg-blue-600 shadow-sm'
+                    : 'text-blue-600 bg-blue-50 hover:bg-blue-100'
+                }`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>My Portal ({currentRoleConfig.label.split(' ')[0]})</span>
+              </button>
+            )}
+          </nav>
+
+          {/* Right Action Controls: Role Switcher, Auth Buttons, Profile */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Gamification Streak & Points (Only shown for Learner in portal view) */}
+            {isLoggedIn && currentRole === 'LEARNER' && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50/80 border border-amber-200/60 text-amber-900 text-xs font-semibold">
                 <span className="flex items-center gap-1 text-amber-600">
                   <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
@@ -70,87 +134,146 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemoInfo }) => {
               </div>
             )}
 
-            {/* Quick 1-Click Role Switcher for Portfolio Demonstration */}
-            <div className="relative">
-              <button
-                onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${currentRoleConfig.color} border-slate-300 hover:border-slate-400`}
-                title="Switch Evaluation Role"
-              >
-                <currentRoleConfig.icon className="w-4 h-4" />
-                <span>{currentRoleConfig.label}</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
-              </button>
+            {/* Quick 1-Click Role Switcher */}
+            {isLoggedIn && (
+              <div className="relative">
+                <button
+                  onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${currentRoleConfig.color} border-slate-300 hover:border-slate-400`}
+                  title="Switch Role Portal"
+                >
+                  <currentRoleConfig.icon className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">{currentRoleConfig.label}</span>
+                  <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                </button>
 
-              {roleDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
-                  <div className="px-3 py-1.5 border-b border-slate-100">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Switch Role Portal
-                    </p>
+                {roleDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in slide-in-from-top-1">
+                    <div className="px-3 py-1.5 border-b border-slate-100">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Switch Active Persona
+                      </p>
+                    </div>
+                    {roles.map((r) => {
+                      const Icon = r.icon;
+                      const isActive = r.role === currentRole;
+                      return (
+                        <button
+                          key={r.role}
+                          onClick={() => {
+                            switchRole(r.role);
+                            setRoleDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-700 font-semibold'
+                              : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className={`p-1 rounded-md ${r.color}`}>
+                            <Icon className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className="font-bold">{r.label}</p>
+                            <p className="text-[10px] text-slate-400 font-normal">
+                              {r.role === 'SUPER_ADMIN' && 'Managed by Shekanna H'}
+                              {r.role === 'ORG_ADMIN' && 'CloudScale Technologies'}
+                              {r.role === 'TRAINER' && 'Course author & grading'}
+                              {r.role === 'LEARNER' && 'Interviews, exams & player'}
+                            </p>
+                          </div>
+                          {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+                        </button>
+                      );
+                    })}
                   </div>
-                  {roles.map((r) => {
-                    const Icon = r.icon;
-                    const isActive = r.role === currentRole;
-                    return (
-                      <button
-                        key={r.role}
-                        onClick={() => {
-                          switchRole(r.role);
-                          setRoleDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors ${
-                          isActive
-                            ? 'bg-blue-50 text-blue-700 font-semibold'
-                            : 'text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className={`p-1 rounded-md ${r.color}`}>
-                          <Icon className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <p>{r.label}</p>
-                          <p className="text-[10px] text-slate-400 font-normal">
-                            {r.role === 'SUPER_ADMIN' && 'Global platform governance'}
-                            {r.role === 'ORG_ADMIN' && 'Tenant administration'}
-                            {r.role === 'TRAINER' && 'Course authoring & grading'}
-                            {r.role === 'LEARNER' && 'Course player & quizzes'}
-                          </p>
-                        </div>
-                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* Demo Credentials Info Button */}
             <button
               onClick={onOpenDemoInfo}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-              title="View Demo Credentials & Architecture"
+              title="View Architecture & All Demo Accounts"
             >
               <Info className="w-4 h-4 text-blue-600" />
-              <span className="hidden md:inline">Demo Guide</span>
+              <span className="hidden sm:inline">Demo Guide</span>
             </button>
 
-            {/* User Profile Avatar */}
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-              <img
-                src={currentUser?.avatarUrl}
-                alt={currentUser?.firstName}
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100"
-              />
-              <div className="hidden lg:block text-left">
-                <p className="text-xs font-semibold text-slate-800 leading-tight">
-                  {currentUser?.firstName} {currentUser?.lastName}
-                </p>
-                <p className="text-[11px] text-slate-500">{currentUser?.email}</p>
+            {/* Logged in vs Logged out controls */}
+            {isLoggedIn ? (
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+                <img
+                  src={currentUser?.avatarUrl}
+                  alt={currentUser?.firstName}
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-100"
+                />
+                <button
+                  onClick={logout}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setAuthModalType('login')}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => setAuthModalType('signup')}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-1.5 rounded-lg text-slate-600 hover:bg-slate-100"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Nav */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden py-3 border-t border-slate-100 space-y-1">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => {
+                  setActiveNavTab(link.id as any);
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
+                  activeNavTab === link.id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+            {isLoggedIn && (
+              <button
+                onClick={() => {
+                  setActiveNavTab('portal');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-blue-600 bg-blue-50"
+              >
+                My Portal ({currentRoleConfig.label})
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

@@ -5,6 +5,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   role: UserRole;
   avatarUrl?: string;
   organizationId?: string | null;
@@ -68,6 +69,23 @@ export interface Module {
   lessons: Lesson[];
 }
 
+export interface CourseProject {
+  title: string;
+  description: string;
+  industryScenario: string;
+  techStack: string[];
+  deliverables: string[];
+  durationWeeks: number;
+}
+
+export interface CourseTrainer {
+  name: string;
+  title: string;
+  experience: string;
+  company: string;
+  avatarUrl: string;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -81,8 +99,13 @@ export interface Course {
   certificateEnabled: boolean;
   modules: Module[];
   instructor: string;
+  trainer: CourseTrainer;
+  scheduleTiming: string;
+  batchStartDate: string;
+  capstoneProject: CourseProject;
   enrolledLearnersCount: number;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  price: string;
 }
 
 export interface Enrollment {
@@ -110,10 +133,47 @@ export interface GamificationProfile {
 
 export interface Certificate {
   id: string;
+  courseId?: string;
   courseTitle: string;
   recipientName: string;
   organizationName: string;
   certificateCode: string;
   issuedDate: string;
   grade: number;
+}
+
+export interface InterviewSchedule {
+  id: string;
+  title: string;
+  roleTarget: string;
+  companyTarget: string;
+  interviewerName: string;
+  dateTime: string;
+  status: 'SCHEDULED' | 'COMPLETED' | 'FEEDBACK_READY';
+  meetLink: string;
+  feedback?: string;
+  score?: number;
+}
+
+export interface ScheduledExam {
+  id: string;
+  title: string;
+  courseTitle: string;
+  dateTime: string;
+  durationMinutes: number;
+  totalMarks: number;
+  status: 'UPCOMING' | 'COMPLETED';
+  score?: number;
+}
+
+export interface ProjectSubmission {
+  id: string;
+  projectTitle: string;
+  courseTitle: string;
+  githubUrl: string;
+  liveDemoUrl?: string;
+  submittedDate: string;
+  status: 'UNDER_REVIEW' | 'APPROVED' | 'NEEDS_CHANGES';
+  mentorFeedback?: string;
+  grade?: string;
 }
