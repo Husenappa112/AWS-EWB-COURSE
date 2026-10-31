@@ -1,0 +1,295 @@
+import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
+import type { Course } from '../../types';
+import {
+  BookPlus,
+  Users,
+  CheckCircle2,
+  TrendingUp,
+  Plus,
+  X,
+} from 'lucide-react';
+
+export const TrainerDashboard: React.FC = () => {
+  const { courses, addCourse } = useApp();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // New Course Form State
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('Engineering & Technology');
+  const [level, setLevel] = useState<'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'>('BEGINNER');
+  const [durationMinutes, setDurationMinutes] = useState(45);
+
+  const handleCreateCourse = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description) return;
+
+    const newCourse: Course = {
+      id: `course-${Date.now()}`,
+      title,
+      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      description,
+      thumbnailUrl:
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
+      category,
+      level,
+      durationMinutes: Number(durationMinutes),
+      passPercentage: 80,
+      certificateEnabled: true,
+      instructor: 'Ananya Iyer',
+      enrolledLearnersCount: 0,
+      status: 'PUBLISHED',
+      modules: [
+        {
+          id: `mod-${Date.now()}-1`,
+          title: 'Module 1: Orientation & Core Concepts',
+          order: 1,
+          lessons: [
+            {
+              id: `les-${Date.now()}-1`,
+              title: '1.1 Foundations & Industry Standards',
+              type: 'DOCUMENT',
+              durationMinutes: 15,
+              order: 1,
+              isRequired: true,
+              textContent: `# Welcome to ${title}\n\nThis training program is designed to deliver industry-standard competencies.`,
+            },
+          ],
+        },
+      ],
+    };
+
+    addCourse(newCourse);
+    setIsModalOpen(false);
+    setTitle('');
+    setDescription('');
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Top Header & Quick Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Trainer & Curriculum Studio</h1>
+          <p className="text-xs text-slate-500">
+            Author courses, manage curriculum modules, and evaluate learner completions
+          </p>
+        </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Create New Course</span>
+        </button>
+      </div>
+
+      {/* Trainer Metrics Overview */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Total Courses</span>
+            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+              <BookPlus className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-slate-900 mt-2">{courses.length}</p>
+          <span className="text-[11px] text-emerald-600 font-medium">100% Published</span>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Active Learners</span>
+            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-slate-900 mt-2">530</p>
+          <span className="text-[11px] text-slate-500">Across 2 organizations</span>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Avg. Pass Rate</span>
+            <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-slate-900 mt-2">88.4%</p>
+          <span className="text-[11px] text-emerald-600 font-medium">+3.2% vs last month</span>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500">Total Training Hours</span>
+            <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <p className="text-2xl font-black text-slate-900 mt-2">1,240 hrs</p>
+          <span className="text-[11px] text-slate-500">Platform-wide engagement</span>
+        </div>
+      </div>
+
+      {/* Courses Managed Table */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">Authored Courses</h2>
+            <p className="text-xs text-slate-500">Curricula and assessments managed by your account</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-600">
+            <thead className="bg-slate-50 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th className="p-4">Course Name</th>
+                <th className="p-4">Category</th>
+                <th className="p-4">Level</th>
+                <th className="p-4">Modules & Lessons</th>
+                <th className="p-4">Enrolled</th>
+                <th className="p-4">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {courses.map((course) => (
+                <tr key={course.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={course.thumbnailUrl}
+                        alt={course.title}
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                      <div>
+                        <p className="font-bold text-slate-900">{course.title}</p>
+                        <p className="text-[11px] text-slate-400">{course.durationMinutes} minutes</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 font-medium text-slate-700">{course.category}</td>
+                  <td className="p-4">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">
+                      {course.level}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    {course.modules.length} modules, {course.modules.flatMap((m) => m.lessons).length}{' '}
+                    lessons
+                  </td>
+                  <td className="p-4 font-bold text-slate-900">{course.enrolledLearnersCount}</td>
+                  <td className="p-4">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      {course.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Create New Course Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="text-base font-bold text-slate-900">Create New Course</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCourse} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Course Title</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Advanced Cloud Security Architecture"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Course learning objectives and syllabus summary..."
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Information Security & Compliance">Information Security</option>
+                    <option value="Modern AI & Machine Learning">AI & Machine Learning</option>
+                    <option value="Engineering & Technology">Engineering</option>
+                    <option value="Leadership & Workplace">Leadership</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Duration (Mins)</label>
+                  <input
+                    type="number"
+                    min="10"
+                    value={durationMinutes}
+                    onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Level</label>
+                <select
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="BEGINNER">Beginner</option>
+                  <option value="INTERMEDIATE">Intermediate</option>
+                  <option value="ADVANCED">Advanced</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                >
+                  Publish Course
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
